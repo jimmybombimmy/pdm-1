@@ -1,0 +1,57 @@
+body {
+  height: 1000px;
+}
+
+.box {
+  width: 400px;
+  height: 300px;
+  position: relative;
+  left: 50%;
+  border: 1px solid;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.circle {
+  --circle-size: 100px;
+  height: var(--circle-size);
+  width: var(--circle-size);
+  border-radius: 50%;
+  display: grid;
+  justify-content: center;
+  align-content: center;
+}
+
+.line {
+  --button-line-border: 2px;
+  height: calc(var(--circle-size) / 4);
+  width: calc(var(--circle-size) / 10);
+  position: relative;
+  margin: 0;
+  margin-bottom: calc(0px - var(--circle-size) / 4 - (var(--button-line-border) * 2));
+  margin-right: calc(0px - var(--circle-size) / 10 - (var(--button-line-border) * 2));
+  right: calc(0px - var(--circle-size) / 3 - var(--button-line-border));
+  border: 2px solid;
+  bottom: calc(var(--circle-size) * 0.05);
+  color: black;
+  background-color: white;
+  z-index: 1;
+}
+
+.circle-inner {
+  --inner-circle-size: calc(var(--circle-size) * 0.85);
+  width: var(--inner-circle-size);
+  height: var(--inner-circle-size);
+  border: 2px solid;  
+}
+
+.knobInfo {
+  --size: 2rem;
+  height: --size;
+  position: relative;
+  margin: 0 auto;
+  font-size: var(--size);
+  font-family: Arial, Helvetica, sans-serif;
+}
