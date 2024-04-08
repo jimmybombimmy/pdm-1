@@ -1,4 +1,19 @@
 body {
-  height: 1000px;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
 }
 
+.box {
+  width: 1000px;
+  height: 500px;
+  position: relative;
+  align-items: center;
+}
+
+.drum-line {
+  width: 100%;
+  background-color: azure;
+  display: flex;
+  margin: auto;
+}
