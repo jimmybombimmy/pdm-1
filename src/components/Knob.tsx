@@ -21,18 +21,14 @@ const Knob: React.FC<KnobProps> = ({ size }) => {
 
   function knobPosition() {
     let value = Math.ceil((tempY[0] - tempY[1]) / 2 + knobPrev);
-    let outPutValue = Math.ceil((tempY[0] - tempY[1]) / 2 + knobPrev);
-    let tempYo = ((outPutValue - knobPrev) + (tempY[1] / 2)) * 2
-    
+
     if (value > 100) {
       value = 100;
-      // tempY[1]
-    }
-    if (value < 0) {
-      
+      tempY[0] = tempY[1] + (200 - (knobPrev * 2));
+    } else if (value < 0) {
       value = 0;
-    }
-    console.log("value", value, tempY[0], tempY[1], knobPrev, tempYo)
+      tempY[0] = tempY[1] - (knobPrev * 2)
+    } 
     setKnobTurn(value);
   }
 
@@ -48,10 +44,8 @@ const Knob: React.FC<KnobProps> = ({ size }) => {
       tempY[0] = startingPosition;
       mouseDragInterval = setInterval(() => {
         knobPosition();
-        console.log(mouseDown, isDragging, position.y, tempY);
       }, 100);
     } else {
-      console.log("stop");
       setIsDragging(false);
       clearInterval(mouseDragInterval);
     }
@@ -78,8 +72,6 @@ const Knob: React.FC<KnobProps> = ({ size }) => {
     <main
       className={`button-box circle${size}`}
       onMouseDown={handleMouseDown}
-      // onMouseUp={handleMouseUp}
-      // onMouseMove={handleMouseMove}
     >
       <div
         className={` circle circle-outer`}

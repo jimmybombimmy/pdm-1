@@ -24,8 +24,7 @@ const App = () => {
 
 
   return (
-    <main className="box" 
->
+    <main className="box">
       <div className="tempo-box">{bpm}</div>
       <section className="drum-line">
         <Knob size={100} />
