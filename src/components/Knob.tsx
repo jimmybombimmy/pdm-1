@@ -8,13 +8,14 @@ let tempY = [0, 0];
 
 interface KnobProps {
   size: 100 | 200;
+  play: boolean;
 }
 
 let startingPosition: number;
 
 const Knob: React.FC<KnobProps> = ({ size }) => {
   const [knobOn, setKnobOn] = useState(false);
-  const [knobTurn, setKnobTurn] = useState(0);
+  const [knobTurn, setKnobTurn] = useState(100);
   const [knobPrev, setKnobPrev] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const { position, mouseDown } = useMousePosition();
