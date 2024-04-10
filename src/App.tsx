@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
+import * as Tone from 'tone'
+
+
 import "./App.css";
 import Knob from "./components/Knob.tsx";
+
+import kick from "./assets/909 samples/BD 909 A Clean.wav"
+const player = new Tone.Player(kick).toDestination()
 
 // let counter = 0;
 let firstBeatPlayed = false
@@ -9,21 +15,25 @@ const App = () => {
   const [bpm, setBpm] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
   const [counter, setCounter] = useState(0)
-  
 
   //Do I even need this now?
   const sequence = [true, false, false, false, false, false, false, false];
 
+  
 
-  useEffect(() => {
+  useEffect (() => {
     let myInterval = 0;
     if (isPlaying) {
-      if (!firstBeatPlayed) {
+      if (!firstBeatPlayed) { 
         setCounter(0)
         firstBeatPlayed = true
+        player.start(0)
       }
-      myInterval = setInterval(myTimer, 1000);
+
+      myInterval = setInterval(myTimer, 500);
+      
       function myTimer() {
+        player.start(0)
         // const date = new Date();
         if (counter >= sequence.length - 1 || counter == -1) {
           sequence[counter] = false;
@@ -57,7 +67,7 @@ const App = () => {
 
       </section>
       <button
-        onClick={() => {
+        onClick={async () => {
           setIsPlaying(!isPlaying);
         }}
       >
