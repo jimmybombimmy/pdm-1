@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import * as Tone from 'tone'
 
 
@@ -8,18 +8,18 @@ import Knob from "./components/Knob.tsx";
 import kick from "./assets/909 samples/BD 909 A Clean.wav"
 const player = new Tone.Player(kick).toDestination()
 
-// let counter = 0;
 let firstBeatPlayed = false
+
+const sequenceHitInfo = {
+  on: false,
+  probability: 100,
+}
 
 const App = () => {
   const [bpm, setBpm] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
   const [counter, setCounter] = useState(0)
-
-  //Do I even need this now?
-  const sequence = [true, false, false, false, false, false, false, false];
-
-  
+  const sequence = useRef(Array(8).fill({...sequenceHitInfo}))
 
   useEffect (() => {
     let myInterval = 0;
@@ -35,21 +35,15 @@ const App = () => {
       function myTimer() {
         player.start(0)
         // const date = new Date();
-        if (counter >= sequence.length - 1 || counter == -1) {
-          sequence[counter] = false;
+        if (counter >= sequence.current.length - 1 || counter == -1) {
           setCounter(0);
-          sequence[counter] = true; 
         } else {
-          sequence[counter] = false;
           setCounter(counter+1);
-          sequence[counter] = true;
         }
       }
     } else {
-      sequence[counter] = false
       clearInterval(myInterval);
       setCounter(-1);
-      sequence[counter] = true
       firstBeatPlayed = false
     }
 
@@ -61,8 +55,8 @@ const App = () => {
     <main className="box">
       <div className="tempo-box">{bpm}</div>
       <section className="drum-line">
-        {sequence.map((knob, i) => {
-          return <Knob size={100} playSound={counter == i ? true :  false} isPlaying />
+        {sequence.current.map((knob, i) => {
+          return <Knob size={100} playSound={counter == i ? true :  false} isPlaying sampleInfo={sequence.current} sampleNumber={i}/>
         })}
 
       </section>

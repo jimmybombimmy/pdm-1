@@ -6,21 +6,29 @@ import "../App.css";
 
 let tempY = [0, 0];
 
+interface SampleInfo {
+  on: boolean;
+  probability: number;
+}
+
 interface KnobProps {
   size: 100 | 200;
   playSound: boolean;
-  isPlaying: boolean
+  isPlaying: boolean;
+  sampleInfo: Array<SampleInfo>;
+  sampleNumber: number;
 }
 
 let startingPosition: number;
 
-const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying }) => {
+const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sampleNumber }) => {
   const [knobOn, setKnobOn] = useState(false);
   const [knobTurn, setKnobTurn] = useState(100);
   const [knobPrev, setKnobPrev] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [knobColor, setKnobColor] = useState("lightgrey");
   const { position, mouseDown } = useMousePosition();
+  const newSam = {on: false, probability: 100 }
 
   function knobPosition() {
     let value = Math.ceil((tempY[0] - tempY[1]) / 2 + knobPrev);
@@ -33,6 +41,8 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying }) => {
       tempY[0] = tempY[1] - (knobPrev * 2)
     } 
     setKnobTurn(value);
+    newSam.probability = value
+    sampleInfo[sampleNumber] = newSam
   }
 
   useEffect(() => {
@@ -71,6 +81,8 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying }) => {
       } else {
         setKnobColor("#7cd3fc")
       }
+      newSam.on = true
+      sampleInfo[sampleNumber] = newSam
     } else {
       if (playSound == true && isPlaying == true) {
         setKnobColor("grey")
@@ -80,6 +92,7 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying }) => {
       } else {
         setKnobColor("lightgrey")
       }
+      newSam.on = false
     }
     
   }, [playSound, knobOn])
