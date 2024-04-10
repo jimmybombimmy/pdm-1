@@ -8,16 +8,18 @@ let tempY = [0, 0];
 
 interface KnobProps {
   size: 100 | 200;
-  play: boolean;
+  playSound: boolean;
+  isPlaying: boolean
 }
 
 let startingPosition: number;
 
-const Knob: React.FC<KnobProps> = ({ size }) => {
+const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying }) => {
   const [knobOn, setKnobOn] = useState(false);
   const [knobTurn, setKnobTurn] = useState(100);
   const [knobPrev, setKnobPrev] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [knobColor, setKnobColor] = useState("lightgrey");
   const { position, mouseDown } = useMousePosition();
 
   function knobPosition() {
@@ -59,6 +61,29 @@ const Knob: React.FC<KnobProps> = ({ size }) => {
     };
   }, [mouseDown]);
 
+  useEffect(() => {
+    if (knobOn) {
+      if (playSound == true && isPlaying == true) {
+        setKnobColor("pink")
+        setTimeout(() => {
+          setKnobColor("#7cd3fc")
+        }, 100)
+      } else {
+        setKnobColor("#7cd3fc")
+      }
+    } else {
+      if (playSound == true && isPlaying == true) {
+        setKnobColor("grey")
+        setTimeout(() => {
+          setKnobColor("lightgrey")
+        }, 100)
+      } else {
+        setKnobColor("lightgrey")
+      }
+    }
+    
+  }, [playSound, knobOn])
+
   function handleClick() {
     setKnobOn(!knobOn);
   }
@@ -81,7 +106,7 @@ const Knob: React.FC<KnobProps> = ({ size }) => {
         <p className="line"></p>
         <button
           className="circle circle-inner"
-          style={{ backgroundColor: knobOn ? "#7cd3fc" : "lightgrey" }}
+          style={{ backgroundColor: knobColor}}
           onClick={handleClick}
         ></button>
       </div>

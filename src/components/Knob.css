@@ -46,7 +46,7 @@
   --inner-circle-size: calc(var(--circle-size) * 0.85);
   width: var(--inner-circle-size);
   height: var(--inner-circle-size);
-  border: 2px solid;  
+  border: 2px solid; 
 }
 
 .knobInfo {
