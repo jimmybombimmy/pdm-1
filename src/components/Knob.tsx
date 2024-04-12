@@ -82,6 +82,7 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sam
         setKnobColor("#7cd3fc")
       }
       newSam.on = true
+      newSam.probability = sampleInfo[sampleNumber].probability
       sampleInfo[sampleNumber] = newSam
     } else {
       if (playSound == true && isPlaying == true) {
@@ -93,6 +94,8 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sam
         setKnobColor("lightgrey")
       }
       newSam.on = false
+      newSam.probability = sampleInfo[sampleNumber].probability
+      sampleInfo[sampleNumber] = newSam
     }
     
   }, [playSound, knobOn])
