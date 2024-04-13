@@ -1,23 +1,33 @@
 body {
-  width: 100vw;
+  width:max-content;
   height: 100vh;
   margin: 0;
 }
 
 .box {
-  width: 1000px;
+  /* width: auto; */
   height: 500px;
   position: relative;
   align-items: center;
 }
 
-.drum-line {
-  width: 100%;
-  background-color: azure;
-  display: flex;
-  margin: auto;
-}
-
 .tempo-text {
   display: inline-block
 }
+
+.drum-line {
+  /* width: 100%; */
+  background-color: azure;
+  display: flex;
+  /* margin: auto; */
+}
+
+.drum-line-info {
+  width: 200px;
+  display: inline;
+}
+
+.drum-line-info h3 {
+  display: inline-block
+}
+

@@ -25,7 +25,9 @@ const App = () => {
   const [bpm, setBpm] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
   const [counter, setCounter] = useState(0);
-  const sequence = useRef(Array(12).fill({ ...sequenceHitInfo }));
+  const [sequence, setSequence] = useState(
+    Array(8).fill({ ...sequenceHitInfo })
+  );
 
   useEffect(() => {
     let myInterval = 0;
@@ -33,7 +35,7 @@ const App = () => {
       if (!firstBeatPlayed) {
         setCounter(0);
         firstBeatPlayed = true;
-        chanceToPlay(sequence.current[0].on, sequence.current[0].probability);
+        chanceToPlay(sequence[0].on, sequence[0].probability);
       }
 
       myInterval = setInterval(myTimer, 60000 / bpm / 4);
@@ -41,7 +43,7 @@ const App = () => {
       function myTimer() {
         // const date = new Date();
         let counterCopy: number;
-        if (counter >= sequence.current.length - 1 || counter == -1) {
+        if (counter >= sequence.length - 1 || counter == -1) {
           setCounter(0);
           counterCopy = 0;
         } else {
@@ -49,8 +51,8 @@ const App = () => {
           counterCopy = counter + 1;
         }
         chanceToPlay(
-          sequence.current[counterCopy].on,
-          sequence.current[counterCopy].probability
+          sequence[counterCopy].on,
+          sequence[counterCopy].probability
         );
       }
     } else {
@@ -63,27 +65,62 @@ const App = () => {
   }, [isPlaying, counter]);
 
   function onTempoChange(e: any) {
-    
     if (e.target.value >= 60 || e.target.value <= 200) {
-      setBpm(e.target.value)
+      setBpm(e.target.value);
+    }
+  }
+
+  function onStepCountChange({ target }: any) {
+    let valueDiff = target.value - sequence.length;
+
+    let sequenceCopy = [...sequence];
+    if (target.value >= 2 && target.value <= 16) {
+      if (valueDiff > 0) {
+        for (let i = 0; i < valueDiff; i++) {
+          sequenceCopy.push(sequenceHitInfo);
+        }
+        setSequence(sequenceCopy);
+      } else if (valueDiff < 0) {
+        valueDiff = valueDiff * -1;
+        for (let i = 0; i < valueDiff; i++) {
+          sequenceCopy.pop();
+        }
+        setSequence(sequenceCopy);
+      }
     }
   }
 
   return (
     <main className="box">
       <div className="tempo-box">
-        <h3 className="tempo-text">Tempo:</h3>
-        {" "}
-        <input type="number" min="60" max="200" defaultValue="120" onChange={onTempoChange}></input>
+        <h3 className="tempo-text">Tempo:</h3>{" "}
+        <input
+          type="number"
+          min="60"
+          max="200"
+          defaultValue="120"
+          onChange={onTempoChange}
+        ></input>
       </div>
       <section className="drum-line">
-        {sequence.current.map((knob, i) => {
+        <div className="drum-line-info">
+          <h3>Step Count:</h3> 
+          {" "}
+          <input
+            type="number"
+            min="2"
+            max="16"
+            defaultValue="8"
+            onChange={onStepCountChange}
+          ></input>
+        </div>
+        {sequence.map((knob, i) => {
           return (
             <Knob
               size={100}
               playSound={counter == i ? true : false}
               isPlaying
-              sampleInfo={sequence.current}
+              sampleInfo={sequence}
               sampleNumber={i}
             />
           );
