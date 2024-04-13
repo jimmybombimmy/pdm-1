@@ -21,44 +21,37 @@ function chanceToPlay(on: boolean, prob: number) {
   }
 }
 
-
 const App = () => {
   const [bpm, setBpm] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
   const [counter, setCounter] = useState(0);
-  const sequence = useRef(Array(8).fill({ ...sequenceHitInfo }));
-
-
+  const sequence = useRef(Array(12).fill({ ...sequenceHitInfo }));
 
   useEffect(() => {
     let myInterval = 0;
     if (isPlaying) {
-      
       if (!firstBeatPlayed) {
         setCounter(0);
         firstBeatPlayed = true;
         chanceToPlay(sequence.current[0].on, sequence.current[0].probability);
-        
       }
 
-      myInterval = setInterval(myTimer, 200);
-      
+      myInterval = setInterval(myTimer, 60000 / bpm / 4);
+
       function myTimer() {
         // const date = new Date();
         let counterCopy: number;
-        console.log(sequence.current[3])
         if (counter >= sequence.current.length - 1 || counter == -1) {
           setCounter(0);
-          counterCopy = 0
-          
+          counterCopy = 0;
         } else {
           setCounter(counter + 1);
-          counterCopy = counter + 1
+          counterCopy = counter + 1;
         }
-        chanceToPlay(sequence.current[counterCopy].on, sequence.current[counterCopy].probability)
-        
-        
-        
+        chanceToPlay(
+          sequence.current[counterCopy].on,
+          sequence.current[counterCopy].probability
+        );
       }
     } else {
       clearInterval(myInterval);
@@ -69,9 +62,20 @@ const App = () => {
     return () => clearInterval(myInterval);
   }, [isPlaying, counter]);
 
+  function onTempoChange(e: any) {
+    
+    if (e.target.value >= 60 || e.target.value <= 200) {
+      setBpm(e.target.value)
+    }
+  }
+
   return (
     <main className="box">
-      <div className="tempo-box">{bpm}</div>
+      <div className="tempo-box">
+        <h3 className="tempo-text">Tempo:</h3>
+        {" "}
+        <input type="number" min="60" max="200" defaultValue="120" onChange={onTempoChange}></input>
+      </div>
       <section className="drum-line">
         {sequence.current.map((knob, i) => {
           return (

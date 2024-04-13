@@ -17,3 +17,7 @@ body {
   display: flex;
   margin: auto;
 }
+
+.tempo-text {
+  display: inline-block
+}
