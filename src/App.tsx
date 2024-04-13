@@ -1,11 +1,12 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState} from "react";
 import * as Tone from "tone";
 
 import "./App.css";
 import Knob from "./components/Knob.tsx";
 
-import kick from "./assets/909 samples/BD 909 A Clean.wav";
-const player = new Tone.Player(kick).toDestination();
+import drums_909 from "../src/assets/909 samples/drums_909.js"
+
+let player = new Tone.Player(drums_909.kick1_909).toDestination();
 
 let firstBeatPlayed = false;
 
@@ -29,6 +30,8 @@ const App = () => {
     Array(8).fill({ ...sequenceHitInfo })
   );
 
+
+  
   useEffect(() => {
     let myInterval = 0;
     if (isPlaying) {
@@ -90,6 +93,23 @@ const App = () => {
     }
   }
 
+  function setSample({ target }: { target: { value: string } }) {
+    player = new Tone.Player(drums_909[target.value]).toDestination();
+  }
+
+  function getDrums() {
+
+    let allDrums = Object.keys(drums_909)
+    return (
+      <select name="drums" id="drums" defaultValue="kick1_909" onChange={setSample}>
+      {allDrums.map((drum) => {
+        return <option key={drum} value={drum}>{drum}</option>
+      })}
+      </select>
+    )
+  }
+  
+
   return (
     <main className="box">
       <div className="tempo-box">
@@ -113,6 +133,8 @@ const App = () => {
             defaultValue="8"
             onChange={onStepCountChange}
           ></input>
+          <h3>Sample:</h3>
+            {getDrums()}
         </div>
         {sequence.map((knob, i) => {
           return (
@@ -122,6 +144,7 @@ const App = () => {
               isPlaying
               sampleInfo={sequence}
               sampleNumber={i}
+              key={`knob${i}`}
             />
           );
         })}
