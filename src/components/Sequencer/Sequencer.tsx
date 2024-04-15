@@ -8,20 +8,20 @@ const sequenceHitInfo = {
 };
 
 interface SequenceProps {
-  sequence: Array<Array<SequenceHitInfoInterface>>;
+  sequence: React.MutableRefObject<SequenceHitInfoInterface[][]>;
   drumLine: Array<SequenceHitInfoInterface>;
   drumNum: number;
-  getDrums: Object;
+  getDrums(n: number): JSX.Element;
   counter: number;
 }
 
 export default function Sequencer({sequence, drumLine, drumNum, getDrums, counter}: SequenceProps) {
 
-  function onStepCountChange({ target }: any) {
-    let valueDiff = target.value - drumLine.length;
+  function onStepCountChange(e: any) {
+    let valueDiff = e.target.value - drumLine.length;
 
     let sequenceCopy = [...drumLine];
-    if (target.value >= 2 && target.value <= 16) {
+    if (e.target.value >= 2 && e.target.value <= 16) {
       if (valueDiff > 0) {
         for (let i = 0; i < valueDiff; i++) {
           sequenceCopy.push(sequenceHitInfo);
@@ -50,7 +50,7 @@ export default function Sequencer({sequence, drumLine, drumNum, getDrums, counte
         onChange={onStepCountChange}
       ></input>
       <h3>Sample:</h3>
-        {getDrums()}
+        {getDrums(drumNum)}
     </div>
     {drumLine.map((knob: any, i: number) => {
       return (
@@ -59,7 +59,7 @@ export default function Sequencer({sequence, drumLine, drumNum, getDrums, counte
           playSound={counter % drumLine.length == i ? true : false}
           isPlaying
           drumLine={drumLine}
-          sampleNumber={i}
+          sampleNum={i}
           key={`knob${i}`}
           sequence={sequence}
           drumNum={drumNum}

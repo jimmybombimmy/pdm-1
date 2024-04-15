@@ -17,8 +17,8 @@ interface Drums {
   [key: string]: string;
 }
 
-const drums_909Obj: Drums = {
+const drumsObj: Drums = {
   kick1_909, kick2_909, snare1_909, snare2_909, clap1_909, clap2_909, rim1_909, tomhi1_909, tommid1_909, tomlo1_909, closedhat1_909, openhat1_909, ride1_909, crash1_909
 }
 
-export default drums_909Obj
+export default drumsObj

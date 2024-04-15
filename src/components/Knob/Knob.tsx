@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import useMousePosition from "../../hooks/useMousePosition";
+import SequenceHitInfoInterface from "../../Interfaces/SequencerInterfaces";
 
 import "./Knob.css";
 import "../../App.css";
@@ -16,14 +17,14 @@ interface KnobProps {
   playSound: boolean;
   isPlaying: boolean;
   drumLine: Array<drumLine>;
-  sampleNumber: number;
-  sequence: Array<object>;
+  sampleNum: number;
+  sequence: React.MutableRefObject<SequenceHitInfoInterface[][]>;
   drumNum: number;
 }
 
 let startingPosition: number;
 
-const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, drumLine, sampleNumber, sequence, drumNum }) => {
+const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, drumLine, sampleNum, sequence, drumNum }) => {
   const [knobOn, setKnobOn] = useState(false);
   const [knobTurn, setKnobTurn] = useState(100);
   const [knobPrev, setKnobPrev] = useState(0);
@@ -98,9 +99,8 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, drumLine, sampl
     const samCopy = {...newSam}
     samCopy.on = knobOn
     samCopy.probability = knobTurn
-    drumLineCopy[sampleNumber] = samCopy
+    drumLineCopy[sampleNum] = samCopy
     sequence.current[drumNum] = drumLineCopy
-    console.log(sequence)
   }, [playSound, knobOn])
 
   function handleClick() {
