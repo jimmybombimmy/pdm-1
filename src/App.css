@@ -2,6 +2,7 @@ body {
   width:max-content;
   height: 100vh;
   margin: 0;
+  background-color: rgb(62, 54, 54);
 }
 
 .box {

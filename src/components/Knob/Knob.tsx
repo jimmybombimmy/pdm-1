@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import useMousePosition from "../hooks/useMousePosition";
+import { useState, useEffect, useRef } from "react";
+import useMousePosition from "../../hooks/useMousePosition";
 
 import "./Knob.css";
-import "../App.css";
+import "../../App.css";
 
-let tempY = [0, 0];
+// let tempY = [0, 0];
 
-interface SampleInfo {
+interface drumLine {
   on: boolean;
   probability: number;
 }
@@ -15,13 +15,15 @@ interface KnobProps {
   size: 100 | 200;
   playSound: boolean;
   isPlaying: boolean;
-  sampleInfo: Array<SampleInfo>;
+  drumLine: Array<drumLine>;
   sampleNumber: number;
+  sequence: Array<object>;
+  drumNum: number;
 }
 
 let startingPosition: number;
 
-const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sampleNumber }) => {
+const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, drumLine, sampleNumber, sequence, drumNum }) => {
   const [knobOn, setKnobOn] = useState(false);
   const [knobTurn, setKnobTurn] = useState(100);
   const [knobPrev, setKnobPrev] = useState(0);
@@ -29,32 +31,31 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sam
   const [knobColor, setKnobColor] = useState("lightgrey");
   const { position, mouseDown } = useMousePosition();
   const newSam = {on: false, probability: 100 }
+  const tempY = useRef([0, 0])
 
   function knobPosition() {
-    let value = Math.ceil((tempY[0] - tempY[1]) / 2 + knobPrev);
+    let value = Math.ceil((tempY.current[0] - tempY.current[1]) / 2 + knobPrev);  
 
     if (value > 100) {
       value = 100;
-      tempY[0] = tempY[1] + (200 - (knobPrev * 2));
+      tempY.current[0] = tempY.current[1] + (200 - (knobPrev * 2));
     } else if (value < 0) {
       value = 0;
-      tempY[0] = tempY[1] - (knobPrev * 2)
+      tempY.current[0] = tempY.current[1] - (knobPrev * 2)
     } 
     setKnobTurn(value);
-    newSam.probability = value
-    sampleInfo[sampleNumber] = newSam
   }
 
   useEffect(() => {
     const updateMousePos1 = (e: any) => {
       startingPosition = e.clientY;
-        tempY[1] = e.clientY;
+      tempY.current[1] = e.clientY;
     };
 
     let mouseDragInterval: any;
 
     if (mouseDown && isDragging) {
-      tempY[0] = startingPosition;
+      tempY.current[0] = startingPosition;
       mouseDragInterval = setInterval(() => {
         knobPosition();
       }, 100);
@@ -72,6 +73,7 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sam
   }, [mouseDown]);
 
   useEffect(() => {
+
     if (knobOn) {
       if (playSound == true && isPlaying == true) {
         setKnobColor("pink")
@@ -81,9 +83,6 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sam
       } else {
         setKnobColor("#7cd3fc")
       }
-      newSam.on = true
-      newSam.probability = sampleInfo[sampleNumber].probability
-      sampleInfo[sampleNumber] = newSam
     } else {
       if (playSound == true && isPlaying == true) {
         setKnobColor("grey")
@@ -93,11 +92,15 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sam
       } else {
         setKnobColor("lightgrey")
       }
-      newSam.on = false
-      newSam.probability = sampleInfo[sampleNumber].probability
-      sampleInfo[sampleNumber] = newSam
     }
-    
+
+    const drumLineCopy = [...drumLine]
+    const samCopy = {...newSam}
+    samCopy.on = knobOn
+    samCopy.probability = knobTurn
+    drumLineCopy[sampleNumber] = samCopy
+    sequence.current[drumNum] = drumLineCopy
+    console.log(sequence)
   }, [playSound, knobOn])
 
   function handleClick() {
@@ -106,7 +109,7 @@ const Knob: React.FC<KnobProps> = ({ size, playSound, isPlaying, sampleInfo, sam
 
   function handleMouseDown() {
     setIsDragging(true);
-    tempY[0] == position.y;
+    tempY.current[0] == position.y;
     setKnobPrev(knobTurn);
   }
 

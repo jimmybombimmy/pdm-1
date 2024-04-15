@@ -1,12 +1,14 @@
-import { useEffect, useState} from "react";
+import { useEffect, useState, useRef } from "react";
 import * as Tone from "tone";
 
 import "./App.css";
-import Knob from "./components/Knob.tsx";
+import Knob from "./components/Knob/Knob.tsx";
+import Sequencer from "./components/Sequencer/Sequencer.tsx";
+import SequenceHitInfoInterface from "./Interfaces/SequencerInterfaces.tsx";
 
-import drums_909 from "../src/assets/909 samples/drums_909.js"
+import drums_909 from "../src/assets/909 samples/drums_909.js";
 
-let player = new Tone.Player(drums_909.kick1_909).toDestination();
+let multiPlayer = new Tone.Players({0: drums_909.kick1_909, 1: drums_909.snare1_909, 2: drums_909.snare2_909, 3: drums_909.clap1_909, 4: drums_909.rim1_909, 5: drums_909.tomlo1_909, 6: drums_909.tommid1_909, 7: drums_909.tomhi1_909, 8: drums_909.closedhat1_909, 9: drums_909.openhat1_909, 10: drums_909.rim1_909, 11: drums_909.crash1_909}).toDestination();
 
 let firstBeatPlayed = false;
 
@@ -18,45 +20,68 @@ const sequenceHitInfo = {
 function chanceToPlay(on: boolean, prob: number) {
   const random = Math.random() * 100;
   if (prob >= random && on == true) {
-    return player.start(0);
+    // return player.start(0);
+    return true
   }
 }
 
 const App = () => {
   const [bpm, setBpm] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [counter, setCounter] = useState(0);
-  const [sequence, setSequence] = useState(
-    Array(8).fill({ ...sequenceHitInfo })
+  const [counter, setCounter] = useState(0); // make this just continually rise and use modulo to determine the steps of each drum
+  const sequence = useRef<Array<SequenceHitInfoInterface>>(
+    Array(12).fill(Array(8).fill({ ...sequenceHitInfo }))
   );
+  // console.log(sequence);
 
-
-  
   useEffect(() => {
     let myInterval = 0;
     if (isPlaying) {
       if (!firstBeatPlayed) {
         setCounter(0);
         firstBeatPlayed = true;
-        chanceToPlay(sequence[0].on, sequence[0].probability);
+        sequence.current.map((line: any, i: number) => {
+          console.log("iiiiiii", i, line)
+          if (chanceToPlay(line[0].on, line[0].probability)) {
+            return multiPlayer.player(String(i)).start();
+          }
+
+        });
+        
       }
 
       myInterval = setInterval(myTimer, 60000 / bpm / 4);
 
       function myTimer() {
         // const date = new Date();
-        let counterCopy: number;
-        if (counter >= sequence.length - 1 || counter == -1) {
-          setCounter(0);
-          counterCopy = 0;
-        } else {
-          setCounter(counter + 1);
-          counterCopy = counter + 1;
-        }
-        chanceToPlay(
-          sequence[counterCopy].on,
-          sequence[counterCopy].probability
-        );
+        setCounter(counter + 1);
+        let counterCopy = counter + 1;
+
+
+
+        // if (counter >= sequence.current.length - 1 || counter == -1) {
+          sequence.current.map((line: any, i: number) => {
+            // console.log(i)
+            // console.log("ying",line, i)
+            // setCounter(0);
+            // counterCopy = 0;
+            if (chanceToPlay(
+              line[counterCopy % line.length].on,
+              line[counterCopy % line.length].probability
+            )) {
+              return multiPlayer.player(String(i)).start();
+            }
+          });
+        // } else {
+        //   sequence.current.map((line) => {
+        //     setCounter(counter + 1);
+        //     counterCopy = counter + 1;
+        //   });
+        // }
+        // chanceToPlay(
+        //   sequence[counterCopy].on,
+        //   sequence[counterCopy].probability
+        // );
       }
     } else {
       clearInterval(myInterval);
@@ -73,42 +98,29 @@ const App = () => {
     }
   }
 
-  function onStepCountChange({ target }: any) {
-    let valueDiff = target.value - sequence.length;
-
-    let sequenceCopy = [...sequence];
-    if (target.value >= 2 && target.value <= 16) {
-      if (valueDiff > 0) {
-        for (let i = 0; i < valueDiff; i++) {
-          sequenceCopy.push(sequenceHitInfo);
-        }
-        setSequence(sequenceCopy);
-      } else if (valueDiff < 0) {
-        valueDiff = valueDiff * -1;
-        for (let i = 0; i < valueDiff; i++) {
-          sequenceCopy.pop();
-        }
-        setSequence(sequenceCopy);
-      }
-    }
-  }
-
   function setSample({ target }: { target: { value: string } }) {
-    player = new Tone.Player(drums_909[target.value]).toDestination();
+    multiPlayer = new Tone.Player(drums_909[target.value]).toDestination();
   }
 
   function getDrums() {
-
-    let allDrums = Object.keys(drums_909)
+    let allDrums = Object.keys(drums_909);
     return (
-      <select name="drums" id="drums" defaultValue="kick1_909" onChange={setSample}>
-      {allDrums.map((drum) => {
-        return <option key={drum} value={drum}>{drum}</option>
-      })}
+      <select
+        name="drums"
+        id="drums"
+        defaultValue="kick1_909"
+        onChange={setSample}
+      >
+        {allDrums.map((drum) => {
+          return (
+            <option key={drum} value={drum}>
+              {drum}
+            </option>
+          );
+        })}
       </select>
-    )
+    );
   }
-  
 
   return (
     <main className="box">
@@ -122,33 +134,21 @@ const App = () => {
           onChange={onTempoChange}
         ></input>
       </div>
-      <section className="drum-line">
-        <div className="drum-line-info">
-          <h3>Step Count:</h3> 
-          {" "}
-          <input
-            type="number"
-            min="2"
-            max="16"
-            defaultValue="8"
-            onChange={onStepCountChange}
-          ></input>
-          <h3>Sample:</h3>
-            {getDrums()}
-        </div>
-        {sequence.map((knob, i) => {
+      <div>
+        {sequence.current.map((drumLine: any, i: number) => {
+          // console.log("corrd", drumLine);
           return (
-            <Knob
-              size={100}
-              playSound={counter == i ? true : false}
-              isPlaying
-              sampleInfo={sequence}
-              sampleNumber={i}
-              key={`knob${i}`}
+            <Sequencer
+              sequence={sequence}
+              drumLine={drumLine}
+              drumNum={i}
+              getDrums={getDrums}
+              counter={counter}
             />
           );
         })}
-      </section>
+      </div>
+      {/*  */}
       <button
         onClick={async () => {
           setIsPlaying(!isPlaying);
